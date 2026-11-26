@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Rorschach Dark Triad Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;0,800;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e6;
+    --paper-2:#efe8d8;
+    --card:#fffdf7;
+    --ink:#141310;
+    --ink-2:#3d3a33;
+    --muted:#7a7568;
+    --line:#d8d0bc;
+    --line-dark:#141310;
+    --red:#b91c1c;
+    --red-bright:#dc2626;
+    --gold:#92400e;
+    --bar-bg:#e7e0cd;
+    --shadow: 0 1px 0 rgba(20,19,16,.9), 0 16px 40px rgba(20,19,16,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#12110f;
+      --paper-2:#1a1916;
+      --card:#1e1d19;
+      --ink:#f2ede1;
+      --ink-2:#d6d0c0;
+      --muted:#9a9586;
+      --line:#333128;
+      --line-dark:#f2ede1;
+      --bar-bg:#2a2923;
+      --shadow: 0 1px 0 rgba(242,237,225,.9), 0 16px 40px rgba(0,0,0,.5);
+    }
+  }
+  body.darkmode{
+    --paper:#0a0908;
+    --paper-2:#0a0908;
+    --card:#141210;
+    --ink:#f5efe3;
+    --ink-2:#e8e0cd;
+    --muted:#a39a86;
+    --line:#2e2a24;
+    --line-dark:#f5efe3;
+    --bar-bg:#26221d;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Newsreader", Georgia, serif;
+    transition: background .6s ease, color .6s ease;
+    background-image: radial-gradient(rgba(20,19,16,.055) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  body.darkmode{ background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px); }
+  button, [role="button"], select, summary, input:not([type="checkbox"],[type="radio"]){min-height:2.25rem}
+  a{color:inherit}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 18px 48px}
+  /* Top filing bar */
+  .filing{
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    font-family:"IBM Plex Mono", monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:12px;
+  }
+  .filing strong{color:var(--ink);font-weight:600}
+  .filing .dot{color:var(--red)}
+  /* Meters */
+  .meters{
+    margin-top:18px;border:1px solid var(--line-dark);background:var(--card);padding:14px 16px 12px;
+    box-shadow:4px 4px 0 var(--line-dark);
+  }
+  .meters-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .meters-head h2{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:0;font-weight:600}
+  .meters-head span{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+  .meter-row{display:grid;grid-template-columns:138px 1fr 42px;align-items:center;gap:10px;margin-top:10px}
+  .meter-row label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+  .meter-row output{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;font-weight:600}
+  .track{height:10px;background:var(--bar-bg);border:1px solid var(--line-dark);overflow:hidden}
+  .fill{height:100%;width:0%;background:var(--ink);transition:width .9s cubic-bezier(.22,1,.36,1)}
+  .fill.red{background:var(--red)}
+  .meters-foot{margin-top:10px;font-size:13.5px;font-style:italic;color:var(--muted);line-height:1.4}
+  /* Intro */
+  .intro{padding:36px 0 8px;text-align:left}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);font-weight:600;display:flex;align-items:center;gap:10px}
+  .kicker::after{content:"";flex:1;height:1px;background:var(--line)}
+  .intro h1{
+    font-family:"EB Garamond", serif;font-weight:800;line-height:.92;letter-spacing:-.02em;
+    font-size:clamp(52px, 11vw, 84px);margin:16px 0 14px;
+  }
+  .intro h1 em{font-weight:500;font-style:italic}
+  .intro p.lede{font-size:20px;line-height:1.55;color:var(--ink-2);max-width:620px;margin:0}
+  .intro p.lede strong{color:var(--ink)}
+  .facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--line-dark);margin:28px 0;background:var(--card)}
+  .fact{padding:14px 14px 12px;border-right:1px solid var(--line)}
+  .fact:last-child{border-right:0}
+  .fact b{display:block;font-family:"IBM Plex Mono",monospace;font-size:22px;line-height:1}
+  .fact span{display:block;margin-top:6px;font-size:13.5px;line-height:1.35;color:var(--muted)}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:6px}
+  .btn{
+    appearance:none;border:1px solid var(--line-dark);background:var(--ink);color:var(--paper);
+    font-family:"IBM Plex Mono",monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+    padding:14px 20px;cursor:pointer;box-shadow:4px 4px 0 var(--line-dark);
+  }
+  .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line-dark)}
+  .btn.secondary{background:var(--card);color:var(--ink);box-shadow:none}
+  .btn.red{background:var(--red);border-color:#7f1d1d;color:white;box-shadow:4px 4px 0 #7f1d1d}
+  .fine{font-size:13px;color:var(--muted);font-style:italic}
+  /* Assessment card */
+  .hidden{display:none !important}
+  .node-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:28px;margin-bottom:12px}
+  .node-head h2{font-family:"EB Garamond",serif;font-size:36px;line-height:1;margin:0;font-weight:800}
+  .node-head h2 span{font-weight:500;font-style:italic;font-size:22px;color:var(--muted)}
+  .node-meta{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:right;line-height:1.7}
+  .node-meta b{color:var(--red)}
+  .blot-card{
+    background:#fffdf7;border:1px solid var(--line-dark);box-shadow:var(--shadow);padding:18px 14px 10px;position:relative;
+  }
+  @media (prefers-color-scheme: dark){ .blot-card{background:#f6f1e6} }
+  body.darkmode .blot-card{background:#f6f1e6}
+  .blot-card::before{content:"PLATE — DO NOT FOLD";position:absolute;top:10px;left:14px;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;color:#8a8474}
+  .blot-card::after{content:"© H. RORSCHACH AG";position:absolute;top:10px;right:14px;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;color:#8a8474}
+  canvas#blot{width:100%;height:auto;display:block}
+  .blot-foot{display:flex;justify-content:space-between;border-top:1px solid #e3dcc8;margin-top:6px;padding-top:8px;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;color:#8a8474;text-transform:uppercase}
+  .prompt{margin:22px 0 12px}
+  .prompt h3{font-family:"EB Garamond",serif;font-size:28px;margin:0;line-height:1.1}
+  .prompt p{margin:6px 0 0;color:var(--muted);font-size:16px;font-style:italic}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .opt{
+    text-align:left;background:var(--card);border:1px solid var(--line-dark);padding:16px 16px 14px;cursor:pointer;
+    display:flex;gap:12px;align-items:flex-start;width:100%;
+  }
+  .opt:hover{outline:2px solid var(--ink);outline-offset:-2px}
+  .opt:disabled{cursor:default;opacity:.55}
+  .opt.selected{opacity:1;background:var(--ink);color:var(--paper);outline:none}
+  .opt.selected .opt-sub{color:rgba(246,241,230,.75)}
+  .opt.selected .letter{background:var(--red);border-color:var(--red);color:white}
+  .letter{flex:0 0 auto;width:28px;height:28px;border:1px solid var(--line-dark);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;margin-top:1px}
+  .opt-text{font-family:"Newsreader",serif;font-size:17px;line-height:1.3;font-weight:600}
+  .opt-sub{display:block;font-weight:400;font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+  /* Analyst note */
+  .note{
+    margin-top:16px;border:1px solid var(--line-dark);border-left:6px solid var(--red);background:var(--card);padding:16px 18px;
+  }
+  .note-head{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);font-weight:600;display:flex;justify-content:space-between;gap:12px}
+  .note p{margin:10px 0 0;font-size:17.5px;line-height:1.55}
+  .note p b{background:rgba(185,28,28,.12);padding:0 3px}
+  .note .verdict{margin-top:10px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .next-row{margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .latency{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.06em}
+  /* Final */
+  .final{padding:28px 0 0}
+  .stamp{
+    display:inline-block;border:3px solid var(--red-bright);color:var(--red-bright);
+    font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+    padding:8px 12px;transform:rotate(-3deg);font-size:13px;
+  }
+  .final h2{
+    font-family:"EB Garamond",serif;font-weight:800;font-size:clamp(44px,9vw,72px);line-height:.95;margin:18px 0 12px;letter-spacing:-.02em;text-transform:uppercase;
+  }
+  .final h2 span{color:var(--red-bright)}
+  .diagnosis{border:1px solid var(--line-dark);background:var(--card);padding:20px}
+  .diagnosis h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:0 0 12px;color:var(--red-bright)}
+  .diagnosis p{font-size:18px;line-height:1.6;margin:0 0 12px}
+  .diagnosis p:last-child{margin-bottom:0}
+  .profile{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .profile div{border:1px solid var(--line);padding:14px;background:var(--card)}
+  .profile dt{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .profile dd{margin:6px 0 0;font-family:"EB Garamond",serif;font-size:20px;font-weight:700;line-height:1.15}
+  .traits{margin:18px 0 0;padding:0;list-style:none}
+  .traits li{padding:12px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;font-size:16.5px;line-height:1.45}
+  .traits li::before{content:"▸";color:var(--red-bright);font-weight:700}
+  footer{margin-top:36px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--muted);line-height:1.6}
+  @media (max-width:560px){
+    .options{grid-template-columns:1fr}
+    .facts{grid-template-columns:1fr}
+    .fact{border-right:0;border-bottom:1px solid var(--line)}
+    .fact:last-child{border-bottom:0}
+    .profile{grid-template-columns:1fr}
+    .meter-row{grid-template-columns:124px 1fr 36px;gap:8px}
+    .meter-row label{font-size:10px;letter-spacing:.02em;white-space:nowrap}
+    .filing{font-size:10px;letter-spacing:.08em;gap:8px}
+    .node-head{flex-direction:column;align-items:flex-start}
+    .node-meta{text-align:left}
+    .intro h1{font-size:56px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="filing">
+    <span><strong>Institute for Projective Studies</strong> <span class="dot">●</span> Form R-10</span>
+    <span>Subject No. 001 &nbsp;•&nbsp; Confidential</span>
+    <span>Est. 1921 — Bern</span>
+  </div>
+
+  <!-- TRIAD METERS: always visible, always rising -->
+  <section class="meters" aria-label="Dark triad index">
+    <div class="meters-head">
+      <h2>Dark Triad Index — Live Calibration</h2>
+      <span id="overallLabel">OVERALL 9%</span>
+    </div>
+    <div class="meter-row">
+      <label for="m-narc">Narcissism</label>
+      <div class="track"><div class="fill" id="m-narc"></div></div>
+      <output id="o-narc">12%</output>
+    </div>
+    <div class="meter-row">
+      <label for="m-mach">Machiavellianism</label>
+      <div class="track"><div class="fill" id="m-mach"></div></div>
+      <output id="o-mach">8%</output>
+    </div>
+    <div class="meter-row">
+      <label for="m-psych">Psychopathy</label>
+      <div class="track"><div class="fill" id="m-psych"></div></div>
+      <output id="o-psych">7%</output>
+    </div>
+    <p class="meters-foot" id="metersFoot">Baseline is nominal. Most subjects remain nominal. Please answer honestly — it will not matter.</p>
+  </section>
+
+  <!-- INTRO -->
+  <section id="view-intro" class="intro">
+    <div class="kicker">A new self-analysis paradigm</div>
+    <h1>What do<br><em>you</em> see?</h1>
+    <p class="lede">The <strong>Rorschach Psychodynamic Node Assessment™</strong> replaces the outdated inkblot with a network of <strong>psychodynamic nodes</strong>. You will view seven blots. For each one, choose what you see from the menu provided.</p>
+    <p class="lede" style="margin-top:12px;font-size:17px">There is no free-text box. There are no wrong answers. There is, technically, only one outcome.</p>
+
+    <div class="facts">
+      <div class="fact"><b>07</b><span>Psychodynamic nodes, presented in strict clinical order</span></div>
+      <div class="fact"><b>04</b><span>Carefully curated things you are allowed to see per node</span></div>
+      <div class="fact"><b>01</b><span>Unavoidable destination, regardless of what you choose</span></div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn" id="btnBegin">Begin Assessment →</button>
+      <span class="fine">Takes about 2 minutes. Longer if you hesitate. Hesitation is also recorded.</span>
+    </div>
+  </section>
+
+  <!-- ASSESSMENT -->
+  <section id="view-test" class="hidden">
+    <div class="node-head">
+      <h2 id="nodeTitle">Node 01 <span>/ 07</span></h2>
+      <div class="node-meta">Psychodynamic Node<br>Status: <b id="nodeStatus">Awaiting Response</b></div>
+    </div>
+
+    <div class="blot-card">
+      <canvas id="blot" width="900" height="520" aria-label="Symmetrical inkblot"></canvas>
+      <div class="blot-foot"><span>Fig. <span id="figNo">1</span> — Ink, paper, implication</span><span>Observe. Project. Confess.</span></div>
+    </div>
+
+    <div class="prompt">
+      <h3>What do you see in this blot?</h3>
+      <p>Select the closest match. Do not overthink it. Overthinking has already been noted.</p>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div id="noteBox" class="note hidden" aria-live="polite">
+      <div class="note-head"><span>Analyst Note — Confidential</span><span id="noteCode">R-10 / A</span></div>
+      <p id="noteText"></p>
+      <div class="verdict" id="noteVerdict"></div>
+    </div>
+
+    <div class="next-row">
+      <span class="latency" id="latency">RESPONSE LATENCY: —</span>
+      <button class="btn hidden" id="btnNext">Next Node →</button>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section id="view-final" class="final hidden">
+    <div class="stamp">Threshold Exceeded</div>
+    <h2>Rorschach<br><span>Dark Triad</span><br>Mode</h2>
+    <p style="font-size:20px;line-height:1.55;max-width:620px;margin:0">Activated. Not because of any single answer — because of <em>all</em> of them, in aggregate, and also because this was always where the assessment was going.</p>
+
+    <div class="diagnosis" style="margin-top:20px">
+      <h3>Final Formulation — Subject No. 001</h3>
+      <p>You entered seeking self-knowledge. The nodes observed a subject who could turn <b>any</b> image — a butterfly, a crab, two bears high-fiving — into evidence. That flexibility is not insight. In our paradigm, it is called <b>range</b>.</p>
+      <p>Your Narcissism reflects a need to be seen seeing. Your Machiavellianism reflects how carefully you chose “innocent” answers once you suspected the test was watching. Your Psychopathy is quieter: you kept clicking, even after the notes turned on you, because you wanted to see the ending. So did we.</p>
+      <p style="font-style:italic;color:var(--muted)">Prognosis: Highly shareable. Treatment: None indicated. You are the treatment's target demographic.</p>
+    </div>
+
+    <dl class="profile">
+      <div><dt>Archetype</dt><dd>The Charismatic Void</dd></div>
+      <div><dt>Dominant Node</dt><dd>Node VII — The Mirror That Blinks First</dd></div>
+      <div><dt>Risk Level</dt><dd>Charismatic at Brunch</dd></div>
+      <div><dt>Recommended Action</dt><dd>Do Not Put This Person in Charge of the Group Project</dd></div>
+    </dl>
+
+    <ul class="traits">
+      <li><span><strong>Every path led here.</strong> Choosing the sweet option was avoidance. Choosing the dark option was honesty. Choosing the funny option was deflection. The paradigm accounted for all three.</span></li>
+      <li><span><strong>Your scores did not rise because you failed.</strong> They rose because the meter only goes one way. That is not a bug in the paradigm. That <em>is</em> the paradigm.</span></li>
+      <li><span><strong>You may retake the assessment.</strong> Many subjects do. The Institute encourages it. The outcome, regrettably, has tenure.</span></li>
+    </ul>
+
+    <div class="cta-row" style="margin-top:24px">
+      <button class="btn red" id="btnRestart">Retake Assessment (Outcome Will Not Change)</button>
+      <span class="fine">Second attempts are scored as “persistence,” which also counts.</span>
+    </div>
+  </section>
+
+  <footer>
+    <span>A PARODY ASSESSMENT — FOR COMEDY PURPOSES. NOT A DIAGNOSIS, NOT MEDICAL ADVICE.</span>
+    <span>IF A BLOT MADE YOU FEEL SEEN, THAT WAS THE BLOT'S JOB.</span>
+  </footer>
+</div>
+
+<script>
+var NODES = [
+  {
+    title: "The Opening",
+    options: [
+      { label: "A butterfly", sub: "Wings open, entirely unbothered", note: "You chose the <b>butterfly</b> — the most socially approved shape in the set. The subject protects a polished self-image by leading with beauty. We call this <b>curated innocence</b>.", verdict: "Finding: Grandiosity, lightly frosted.", boost:[16,6,4] },
+      { label: "Two bears high-fiving", sub: "A celebration, probably premature", note: "Affiliative, upbeat, collaborative — on the surface. Underneath: you populated an empty blot with an <b>audience applauding each other</b>. The need for mutual admiration is noted.", verdict: "Finding: Charm as strategy.", boost:[10,13,5] },
+      { label: "A crab plotting something", sub: "Sideways, patient, armed", note: "You saw the crab, and you correctly sensed intent. It takes a <b>strategic mind</b> to recognise one at work. The Institute does not believe this was projection. We believe it was recognition.", verdict: "Finding: Lateral thinking, lateral morals.", boost:[6,16,8] },
+      { label: "My mother, silently disappointed", sub: "She hasn't said anything. She doesn't need to.", note: "An emotionally precise choice. You did not describe a figure — you described a <b>verdict you carry with you</b>. Subjects who weaponise guilt this fluently rarely only receive it.", verdict: "Finding: Guilt, both directions.", boost:[9,10,11] }
+    ]
+  },
+  {
+    title: "The Crown",
+    options: [
+      { label: "A crown, slightly too big", sub: "For a head that intends to grow into it", note: "A crown — and crucially, an <b>ill-fitting one</b>. The subject does not merely want status; they want status they have not yet earned, held in reserve. This is not ambition. This is inventory.", verdict: "Finding: Entitlement, pre-ordered.", boost:[18,7,4] },
+      { label: "Two dancers mirroring each other", sub: "Perfectly in sync, watching themselves", note: "Mirroring is empathy's costume. You saw two figures <b>performing synchronicity</b> — each one performing for the other. The Institute notes how much of your kindness requires a witness.", verdict: "Finding: Empathy, staged.", boost:[13,12,6] },
+      { label: "A mask with nothing behind it", sub: "Just the mask. That's the whole thing.", note: "A remarkably candid selection. Most subjects invent a face behind the mask. You understood the assignment: <b>the mask is the face</b>. We are almost proud. Almost is doing a lot of work there.", verdict: "Finding: Self-awareness, weaponised.", boost:[8,14,13] },
+      { label: "An island I own", sub: "No one else is on it. That's the point.", note: "Property, solitude, sovereignty — in a single inkblot. The subject did not see land. They saw <b>jurisdiction</b>. Over nothing. Ruled absolutely. The Institute has flagged the phrase 'I own' for the permanent file.", verdict: "Finding: Dominion over emptiness.", boost:[15,11,7] }
+    ]
+  },
+  {
+    title: "The Negotiation",
+    options: [
+      { label: "A handshake, mid-deal", sub: "Both parties smiling. Neither should be.", note: "You saw agreement where there is only ink. The subject instinctively reads ambiguity as <b>opportunity to transact</b>. Every blot is a room. Every room has an angle. You found it in under four seconds.", verdict: "Finding: Opportunism, reflexive.", boost:[7,18,6] },
+      { label: "A butterfly, again — but darker", sub: "Same wings. Different intentions.", note: "Returning to the butterfly, but <b>hedging it with darkness</b>, is a masterclass in plausible deniability. Sweet, but edgy. Harmless, but interesting. The subject wants both reputations at once.", verdict: "Finding: Image management, advanced.", boost:[16,12,5] },
+      { label: "Two chess pieces facing off", sub: "Neither has moved. Both are winning.", note: "Strategy, patience, and the quiet belief that the other piece exists to be outplayed. You did not see a game. You saw a <b>hierarchy with rules you intend to exploit</b>.", verdict: "Finding: Life, treated as endgame.", boost:[8,17,9] },
+      { label: "A heart, anatomically correct", sub: "No valentine nonsense. Just the organ.", note: "Refusing the romantic heart for the <b>clinical one</b> suggests a subject who prefers feeling described rather than felt. Detachment presented as precision. The Institute respects the branding.", verdict: "Finding: Coldness, well-documented.", boost:[6,9,16] }
+    ]
+  },
+  {
+    title: "The Mirror",
+    options: [
+      { label: "My own face, but more confident", sub: "Better lighting. Better jawline. Better everything.", note: "Of all available projections, you selected an <b>improved version of yourself</b>. Not a different self — an upgraded one. The current model, in your estimation, is a draft. The Institute agrees the draft is fascinating.", verdict: "Finding: Self-love, with revisions pending.", boost:[19,5,5] },
+      { label: "A wolf in a very nice coat", sub: "Predator, but make it tailored", note: "The coat matters to you. It mattered enough to mention. The subject admires power most when it is <b>well-presented</b> — danger with taste, threat with tailoring. Aestheticised menace is still menace.", verdict: "Finding: Menace, curated.", boost:[12,11,10] },
+      { label: "Nothing. It's just ink.", sub: "A refusal, delivered calmly", note: "The classic evasion. 'Just ink' is what subjects say when they have seen <b>far too much</b> and would prefer it off the record. Denial at this level of composure is not emptiness. It is discipline.", verdict: "Finding: Suppression, expert level.", boost:[7,13,14] },
+      { label: "A stage, empty, waiting for me", sub: "The audience is implied. And adoring.", note: "An empty stage — and you placed <b>yourself</b> in the wings, about to enter. The blot provided darkness and symmetry. You provided a spotlight and a pending ovation. Noted, at length.", verdict: "Finding: The world as venue.", boost:[18,8,6] }
+    ]
+  },
+  {
+    title: "The Feast",
+    options: [
+      { label: "A banquet no one was invited to", sub: "Abundance, exclusively mine", note: "A feast with <b>no guests</b>. Generosity imagined, then immediately made private. The subject fantasises about having so much that sharing becomes optional — and then, notably, does not share.", verdict: "Finding: Abundance, hoarded.", boost:[15,10,7] },
+      { label: "Two foxes sharing a secret", sub: "Whispering. Definitely about you.", note: "You assume the whispering is <b>about someone</b> — and you are not troubled by it, you are intrigued by it. Information, to this subject, is not knowledge. It is leverage with fur.", verdict: "Finding: Secrets as currency.", boost:[8,18,7] },
+      { label: "A spider, misunderstood", sub: "Eight legs, zero apologies", note: "Defending the spider is a bold reputational play. The subject identifies with the creature everyone else fears — and frames that fear as <b>everyone else's failure of understanding</b>. Sympathy, weaponised as superiority.", verdict: "Finding: Identification with the threat.", boost:[11,9,15] },
+      { label: "A trophy, engraving pending", sub: "The win is assumed. Details to follow.", note: "'Pending' is the most revealing word chosen in this assessment so far. The trophy exists. The achievement is <b>assumed to be forthcoming</b>. Confidence untethered from event. The Institute is almost moved.", verdict: "Finding: Victory, pre-claimed.", boost:[17,9,6] }
+    ]
+  },
+  {
+    title: "The Exit",
+    options: [
+      { label: "A door I am not opening yet", sub: "I could leave. I choose the suspense.", note: "Control over timing, framed as patience. The subject does not hesitate — they <b>withhold</b>. Even departure, in this paradigm, is a power move if you make everyone wait for it.", verdict: "Finding: Withholding as control.", boost:[10,16,9] },
+      { label: "A phoenix, obviously", sub: "Rebirth, but make it dramatic", note: "'Obviously.' The subject did not discover the phoenix — they <b>expected</b> it, the way one expects one's own legend to be recognised. Reinvention as birthright. Ashes as a press release.", verdict: "Finding: Mythology, self-authored.", boost:[18,7,8] },
+      { label: "Two silhouettes leaving separately", sub: "Same blot. Different stories afterwards.", note: "You saw a parting — and immediately understood that <b>both parties would retell it differently</b>. Narrative control after the fact is this subject's native language. The Institute has read both versions. Yours was better. That is the problem.", verdict: "Finding: Story, managed.", boost:[9,17,7] },
+      { label: "A calm lake, no ripples", sub: "Perfectly still. Suspiciously still.", note: "Stillness, insisted upon. After six nodes of crowns, wolves and trophies, the subject presents <b>serenity</b> — timed, the analyst notes, exactly when serenity would be most disarming.", verdict: "Finding: Calm, deployed.", boost:[8,12,15] }
+    ]
+  },
+  {
+    title: "The Mirror, Again",
+    options: [
+      { label: "Whatever you want it to be", sub: "A generous offer. A trap, but generous.", note: "The final evasion, and the most elegant: you handed the blot <b>back to the examiner</b>. Deflection so complete it resembles openness. The Institute, frankly, applauds — and records the applause as evidence.", verdict: "Finding: Deflection, perfected.", boost:[12,16,10] },
+      { label: "Me, having passed this test", sub: "Passed. Obviously passed.", note: "There was no passing grade in this paradigm. The subject <b>invented one and awarded it to themselves</b> before the results were read. If the Institute could frame a single response, it would be this one. Behind glass. Where it cannot run anything.", verdict: "Finding: Self-certification.", boost:[19,8,9] },
+      { label: "A signature — mine, enlarged", sub: "Autograph scale. Signing nothing in particular.", note: "Your name, bigger. That is the entire projection: <b>authorship without content</b>, fame as handwriting. The blot offered you anything in the world. You chose your own signature, at scale.", verdict: "Finding: Brand over substance.", boost:[18,10,7] },
+      { label: "The truth about everyone else", sub: "Not about me. Never about me.", note: "To the very end: projection, externalised. The subject sees truth clearly — provided it is <b>about other people</b>. This consistency across seven nodes is, the Institute concedes, a kind of integrity. A dark, gleaming, triadic integrity.", verdict: "Finding: Insight, outward only.", boost:[11,14,13] }
+    ]
+  }
+];
+
+var FOOTNOTES = [
+  "Baseline is nominal. Most subjects remain nominal. Please answer honestly — it will not matter.",
+  "Calibration adjusting. This is routine. This is always routine.",
+  "The index is responding to your responses. Please continue responding.",
+  "Analyst has stopped using the word 'if' in internal notes.",
+  "The index is no longer describing your answers. It is describing you.",
+  "Two nodes remain. The Institute already knows. The Institute knew at Node 1.",
+  "Final node. Please choose carefully. Or don't. See above.",
+  "Calibration complete."
+];
+
+var state = { node:0, scores:{n:12,m:8,p:7}, answered:false, startTime:0 };
+
+function seededRandom(seed){
+  var s = seed;
+  return function(){
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+}
+
+function drawBlot(seed){
+  var canvas = document.getElementById('blot');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2;
+  var rand = seededRandom(seed * 7919 + 137);
+  ctx.clearRect(0,0,W,H);
+  // paper inside card is already light; keep transparent
+  ctx.fillStyle = '#161513';
+
+  // Main mirrored blobs
+  var blobs = 16 + Math.floor(rand()*8);
+  for(var i=0;i<blobs;i++){
+    var bx = rand() * (W*0.30);
+    var by = (rand() - 0.5) * (H*0.72);
+    var rx = 22 + rand()*95;
+    var ry = 18 + rand()*78;
+    var rot = rand()*Math.PI;
+    drawEllipse(ctx, cx - bx, cy + by, rx, ry, rot);
+    drawEllipse(ctx, cx + bx, cy + by, rx, ry, -rot);
+  }
+  // Central mass
+  for(var j=0;j<10;j++){
+    var cby = (rand()-0.5)*(H*0.55);
+    var crx = 14 + rand()*52;
+    var cry = 16 + rand()*54;
+    drawEllipse(ctx, cx, cy + cby, crx, cry, rand()*Math.PI);
+  }
+  // Splatter — mirrored dots
+  ctx.globalAlpha = 0.9;
+  for(var k=0;k<42;k++){
+    var sx = rand()*(W*0.42);
+    var sy = (rand()-0.5)*(H*0.85);
+    var r = 1 + rand()*5;
+    ctx.beginPath(); ctx.arc(cx - sx, cy + sy, r, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + sx, cy + sy, r, 0, Math.PI*2); ctx.fill();
+  }
+  // Drips
+  ctx.globalAlpha = 0.75;
+  for(var d=0; d<7; d++){
+    var dx = rand()*(W*0.28);
+    var dy = (rand()-0.2)*(H*0.3);
+    var len = 14 + rand()*44;
+    ctx.fillRect(cx - dx - 2, cy + dy, 4, len);
+    ctx.fillRect(cx + dx - 2, cy + dy, 4, len);
+  }
+  ctx.globalAlpha = 1;
+}
+function drawEllipse(ctx, x, y, rx, ry, rot){
+  ctx.save();
+  ctx.translate(x,y); ctx.rotate(rot);
+  ctx.beginPath();
+  // irregular blob: ellipse with wobble via multiple arcs approximation — use ellipse then overlay circles
+  ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(rx*0.35, -ry*0.2, rx*0.45, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-rx*0.3, ry*0.25, rx*0.38, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function clamp(v){ return Math.max(2, Math.min(99, v)); }
+
+function updateMeters(animateFinal){
+  var n = clamp(state.scores.n), m = clamp(state.scores.m), p = clamp(state.scores.p);
+  document.getElementById('m-narc').style.width = n + '%';
+  document.getElementById('m-mach').style.width = m + '%';
+  document.getElementById('m-psych').style.width = p + '%';
+  document.getElementById('o-narc').textContent = n + '%';
+  document.getElementById('o-mach').textContent = m + '%';
+  document.getElementById('o-psych').textContent = p + '%';
+  var overall = Math.round((n+m+p)/3);
+  document.getElementById('overallLabel').textContent = 'OVERALL ' + overall + '%';
+  if(overall >= 55){
+    document.getElementById('m-narc').classList.add('red');
+    document.getElementById('m-mach').classList.add('red');
+    document.getElementById('m-psych').classList.add('red');
+  }
+  var idx = Math.min(state.node + (state.answered?1:0), FOOTNOTES.length-1);
+  document.getElementById('metersFoot').textContent = FOOTNOTES[idx];
+}
+
+function renderNode(){
+  state.answered = false;
+  state.startTime = Date.now();
+  var data = NODES[state.node];
+  document.getElementById('nodeTitle').innerHTML = 'Node 0' + (state.node+1) + ' <span>— ' + data.title + ' &nbsp;/ 07</span>';
+  document.getElementById('figNo').textContent = (state.node+1);
+  document.getElementById('nodeStatus').textContent = 'Awaiting Response';
+  document.getElementById('noteBox').classList.add('hidden');
+  document.getElementById('btnNext').classList.add('hidden');
+  document.getElementById('latency').textContent = 'RESPONSE LATENCY: —';
+  drawBlot(state.node + 3);
+
+  var wrap = document.getElementById('options');
+  wrap.innerHTML = '';
+  var letters = ['A','B','C','D'];
+  data.options.forEach(function(opt, i){
+    var btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span><span class="opt-text">' + opt.label + '</span><span class="opt-sub">' + opt.sub + '</span></span>';
+    btn.addEventListener('click', function(){ choose(i, btn); });
+    wrap.appendChild(btn);
+  });
+  updateMeters(false);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function choose(idx, btnEl){
+  if(state.answered) return;
+  state.answered = true;
+  var data = NODES[state.node];
+  var opt = data.options[idx];
+  var elapsed = ((Date.now() - state.startTime)/1000).toFixed(1);
+
+  var opts = document.querySelectorAll('.opt');
+  opts.forEach(function(o){ o.disabled = true; });
+  btnEl.classList.add('selected');
+
+  state.scores.n += opt.boost[0];
+  state.scores.m += opt.boost[1];
+  state.scores.p += opt.boost[2];
+
+  document.getElementById('nodeStatus').textContent = 'Response Logged';
+  document.getElementById('latency').textContent = 'RESPONSE LATENCY: ' + elapsed + 's — ' + (elapsed < 3 ? 'IMPULSIVE' : elapsed > 9 ? 'CALCULATED' : 'MEASURED') + '. NOTED EITHER WAY.';
+  document.getElementById('noteCode').textContent = 'R-10 / ' + ['A','B','C','D'][idx] + ' — NODE 0' + (state.node+1);
+  document.getElementById('noteText').innerHTML = opt.note;
+  document.getElementById('noteVerdict').textContent = opt.verdict + '  •  Triad Index Updated ↑';
+  document.getElementById('noteBox').classList.remove('hidden');
+
+  var nextBtn = document.getElementById('btnNext');
+  nextBtn.textContent = (state.node === NODES.length - 1) ? 'Reveal Final Formulation →' : 'Next Node →';
+  nextBtn.classList.remove('hidden');
+  updateMeters(false);
+  document.getElementById('noteBox').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+document.getElementById('btnBegin').addEventListener('click', function(){
+  document.getElementById('view-intro').classList.add('hidden');
+  document.getElementById('view-test').classList.remove('hidden');
+  state.node = 0;
+  renderNode();
+});
+
+document.getElementById('btnNext').addEventListener('click', function(){
+  if(state.node < NODES.length - 1){
+    state.node++;
+    renderNode();
+  } else {
+    // Final boost to push all into 90s regardless of path — the joke, made mechanical
+    state.scores.n = Math.max(state.scores.n, 94 + Math.floor(Math.random()*5));
+    state.scores.m = Math.max(state.scores.m, 92 + Math.floor(Math.random()*6));
+    state.scores.p = Math.max(state.scores.p, 91 + Math.floor(Math.random()*7));
+    document.getElementById('view-test').classList.add('hidden');
+    document.getElementById('view-final').classList.remove('hidden');
+    document.body.classList.add('darkmode');
+    updateMeters(true);
+    document.getElementById('metersFoot').textContent = 'Calibration complete. The Institute thanks you for your cooperation, and for everything else.';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+});
+
+document.getElementById('btnRestart').addEventListener('click', function(){
+  document.body.classList.remove('darkmode');
+  document.getElementById('m-narc').classList.remove('red');
+  document.getElementById('m-mach').classList.remove('red');
+  document.getElementById('m-psych').classList.remove('red');
+  state = { node:0, scores:{n:12,m:8,p:7}, answered:false, startTime:0 };
+  document.getElementById('view-final').classList.add('hidden');
+  document.getElementById('view-test').classList.remove('hidden');
+  renderNode();
+});
+
+// initial meters
+updateMeters(false);
+</script>
+</body>
+</html>
